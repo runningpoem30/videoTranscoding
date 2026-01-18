@@ -1,0 +1,31 @@
+{
+  "name": "videotranscoding",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev" : "tsc-watch  --onSuccess \"node dist/index\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/runningpoem30/videoTranscoding.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/runningpoem30/videoTranscoding/issues"
+  },
+  "homepage": "https://github.com/runningpoem30/videoTranscoding#readme",
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.971.0",
+    "aws-lambda": "^1.0.7",
+    "dotenv": "^17.2.3",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "tsc-watch": "^7.2.0"
+  }
+}
