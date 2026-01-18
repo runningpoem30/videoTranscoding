@@ -1,4 +1,5 @@
 import { SQSClient  , ReceiveMessageCommand , DeleteMessageCommand} from "@aws-sdk/client-sqs";
+import type {S3Event} from "aws-lambda"
 import * as dotenv from 'dotenv';
 dotenv.config();
 
@@ -30,17 +31,43 @@ async function main(){
             console.log(`no message in queue`);
             continue;
         }
-
-        for (const message of Messages){
+        try{
+                  for (const message of Messages){
             const { MessageId , Body} = message;
             console.log(`Message Receied` , {MessageId , Body});
+            
+            //validating the message 
+            if(!Body) continue;
+            const event = JSON.parse(Body) as S3Event; 
+
+           if(event.Records?.length) {
+            if((event as any).Event == "s3:TestEvent"){
+                console.log("received the s3 test even . this needs to be ignored")
+                continue;
+            }
+
+            console.log(`received empty or unknown event structure`)
+            return;
+           }
+
+           for (const record of event.Records){
+            const {eventName , s3} = record;
+            const {bucket , object : {
+                key 
+            }} = s3
+           }
+
+           // now we need to spin up the docker container
 
 
-            //spinning up the docker image and inside that processing the ffmpeg code.  
-            // when container starts , it will read the s3 bucket and key from the environment variables (and pass it tothe lambda function)
 
-            //downloading the raw file and spawning ffmpeg as a child process
         } 
+        }
+        catch(error){
+            console.log(error);
+        }
+
+      
     }
 }
 
