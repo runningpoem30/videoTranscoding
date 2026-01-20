@@ -18,6 +18,10 @@ const client = new SQSClient({
 });
 
 
+// this code is basically traditionally writtein 
+// i need to convert this to a serverless
+
+
 async function main(){
     const command = new ReceiveMessageCommand({
         QueueUrl : process.env.SQS_QUEUE_URL,
@@ -32,7 +36,7 @@ async function main(){
             continue;
         }
         try{
-                  for (const message of Messages){
+            for (const message of Messages){
             const { MessageId , Body} = message;
             console.log(`Message Receied` , {MessageId , Body});
             
@@ -72,3 +76,41 @@ async function main(){
 }
 
 main()
+
+
+/// in a non serverless architecture , i will have to do the following things :
+// server kleba padega
+// os install 
+// deployments
+// scale up and scale down 
+// scaling up 
+// pricing per hour 
+// website is still running so ill keep getting charged 
+
+
+
+
+// serverless me 
+// tum bas code likho 
+// you dont have to worry about infrastructure 
+// amazon will decide everything 
+// i dont have to worry about anything 
+// i dont have a server . i just have to code 
+// isme rate per invocation hota hai 
+// jab ek user aayega iss par ---> jab api call karega ---> aws mera code ko start karega --> line by line execute karega and then sleep ho jayega
+// scaling isme automatic hoti hai 
+// code sleep state me hoga ;
+// agar 1000 users aagye , mere code ke multiple copies bna dega , bahot sarae functions parallely execute hone lagega 
+// then again sleep state me chala jayega 
+
+
+// drawbacks 
+// this is stateless 
+// cold start this is slow 
+
+ 
+
+
+
+
+
