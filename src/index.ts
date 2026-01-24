@@ -18,10 +18,6 @@ const client = new SQSClient({
 });
 
 
-// this code is basically traditionally writtein 
-// i need to convert this to a serverless
-
-
 async function main(){
     const command = new ReceiveMessageCommand({
         QueueUrl : process.env.SQS_QUEUE_URL,
@@ -75,13 +71,63 @@ async function main(){
     }
 }
 
-main()
+
+// in traditional code you would usually write while(true) loop to poll sqs . but here we dont need to do that 
+
+// pollers use the same receive api i used , but they run on aws internal servers , when they find a message they bundle them into a json object 
+// and then this object is directly pushed inside the event 
+
+
+//event --> this is the whole wrapper 
+//.Records is an array because aws might pick up 10 messages at once 
+// [0].body --> this is the acutal string that is put into the queue 
 
 
 
- 
 
 
 
 
 
+export const handler = async(event : any ) => {
+    //first of you dont need to get the client 
+
+    for (const record of event.Records){
+
+    }
+}
+
+{"Records":
+    [{"eventVersion":"2.1",
+        "eventSource":"aws:s3",
+        "awsRegion":"us-east-1",
+        "eventTime":"2026-01-21T11:24:42.212Z",
+        "eventName":"ObjectCreated:Put",
+        "userIdentity":{"principalId":"A3OGR1BI53RX6N"},
+        "requestParameters":{"sourceIPAddress":"223.181.104.219"},"responseElements":{"x-amz-request-id":"YEG5KH4AS5VR7EEX","x-amz-id-2":"1lvWj6SSGdsZKvJW4YLd9tE6vsZ5JRqQiH7noILNf6mY01Y26uPYk23BCDmsC6zi64TnNsYKES4HSjTi0a/iCSvhm8cm+pvP"},
+        "s3":{ 
+            "s3SchemaVersion":"1.0",
+            "configurationId":"addingsqsins3bucket",
+            "bucket":{"name":"transcoding-videos.goarya.dev",
+                "ownerIdentity":{"principalId":"A3OGR1BI53RX6N"},"arn":"arn:aws:s3:::transcoding-videos.goarya.dev"},
+                "object":{
+                    "key":"test1.mp4",
+                    "size":3034946,
+                    "eTag":"21f5a5308bb4af429e44408713f81371","sequencer":"006970B77A23F9637D"
+                }
+        }}]
+
+}
+
+
+
+
+
+
+
+
+
+// we need a object storage 
+// aws account -> s3 service --> simple storage service 
+// we have buckets in this simple storage service
+// we store user's data inside it 

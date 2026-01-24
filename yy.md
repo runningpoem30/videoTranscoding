@@ -42,3 +42,41 @@ sqsqueue -> https://us-east-1.console.aws.amazon.com/sqs/v3/home?region=us-east-
 // drawbacks 
 // this is stateless 
 // cold start this is slow 
+
+
+
+
+
+// in traditional code you would usually write while(true) loop to poll sqs . but here we dont need to do that 
+
+// pollers use the same receive api i used , but they run on aws internal servers , when they find a message they bundle them into a json object 
+// and then this object is directly pushed inside the event 
+
+
+//event --> this is the whole wrapper 
+//.Records is an array because aws might pick up 10 messages at once 
+// [0].body --> this is the acutal string that is put into the queue 
+
+
+//aryaYoutube@123
+
+//Testarya@123
+
+
+
+
+
+
+if you try to acces the private bucket , you cant access anything from a private bucker 
+you need a token and a signature
+
+
+
+presigned url --> put object -- to upload things
+get object - to read things 
+
+
+
+// put application in s3 aws 
+// put object presigned urls 
+
