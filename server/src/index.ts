@@ -1,5 +1,5 @@
 import { SQSClient  , ReceiveMessageCommand , DeleteMessageCommand} from "@aws-sdk/client-sqs";
-import {S3Client , PutObjectCommand} from "@aws-sdk/client-s3"
+import {S3Client , PutObjectCommand , type PutObjectCommandInput} from "@aws-sdk/client-s3"
 import type {S3Event} from "aws-lambda"
 import { getSignedUrl} from '@aws-sdk/s3-request-presigner'
 import express from 'express'
@@ -9,7 +9,7 @@ dotenv.config();
 
 const app = express()
 const PORT = process.env.PORT
-
+app.use(express.json()); 
 
 const { ACCESS_KEY_ID, SECRET_ACCESS_KEY, AWS_REGION } = process.env;
 
@@ -17,23 +17,21 @@ if (!ACCESS_KEY_ID || !SECRET_ACCESS_KEY || !AWS_REGION) {
     throw new Error("Missing AWS Credentials in .env file");
 }
 
-const sqsClient = new SQSClient({
-    region: AWS_REGION,
-    credentials: {
-        accessKeyId: ACCESS_KEY_ID,
-        secretAccessKey: SECRET_ACCESS_KEY
-    }
-});
+// const sqsClient = new SQSClient({
+//     region: AWS_REGION,
+//     credentials: {
+//         accessKeyId: ACCESS_KEY_ID,
+//         secretAccessKey: SECRET_ACCESS_KEY
+//     }
+// });
 
-
-const s3Client = new SQSClient({
+const s3Client = new S3Client({ 
     region : AWS_REGION , 
     credentials : {
         accessKeyId : ACCESS_KEY_ID , 
         secretAccessKey : SECRET_ACCESS_KEY
     }
-})
-
+});
 
 
 //get the object first and then check it ig 
@@ -42,23 +40,31 @@ app.post('/upload' , async (req , res) => {
     try{
 
         //we take the filename and content type from the user
-        const {filename , ContentType} = req.body; 
-        const key = `video-uploads/${Date.now()}-${filename}`
+        const {fileName , ContentType} = req.body; 
 
-        const command = new PutObjectCommand({
+
+        if (!fileName) {
+            return res.status(400).json({ error: "fileName is required" });
+        }
+
+
+        const key = `video-uploads/${Date.now()}-${fileName}`
+
+    
+        const input : PutObjectCommandInput = {
         Bucket : process.env.BUCKET , 
         Key : key,
         ContentType : ContentType
-    });
+    };
 
+    const response = new PutObjectCommand(input)
 
-    const url = await getSignedUrl(s3Client , command as any , {expiresIn : 3600})
+    const url = await getSignedUrl(s3Client , response as any  , {expiresIn : 3600})
 
     return res.status(200).json({
         uploadUrl : url , 
         key : key 
     })
-
 
     }
 
