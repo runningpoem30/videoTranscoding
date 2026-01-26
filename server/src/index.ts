@@ -1,4 +1,3 @@
-import { SQSClient  , ReceiveMessageCommand , DeleteMessageCommand} from "@aws-sdk/client-sqs";
 import {S3Client , PutObjectCommand , type PutObjectCommandInput} from "@aws-sdk/client-s3"
 import type {S3Event} from "aws-lambda";
 import { getSignedUrl} from '@aws-sdk/s3-request-presigner';
