@@ -1,15 +1,18 @@
 import { SQSClient  , ReceiveMessageCommand , DeleteMessageCommand} from "@aws-sdk/client-sqs";
 import {S3Client , PutObjectCommand , type PutObjectCommandInput} from "@aws-sdk/client-s3"
-import type {S3Event} from "aws-lambda"
-import { getSignedUrl} from '@aws-sdk/s3-request-presigner'
+import type {S3Event} from "aws-lambda";
+import { getSignedUrl} from '@aws-sdk/s3-request-presigner';
+import cors from 'cors';
 import express from 'express'
 import * as dotenv from 'dotenv';
+
 dotenv.config();
 
 
 const app = express()
 const PORT = process.env.PORT
 app.use(express.json()); 
+app.use(cors())
 
 const { ACCESS_KEY_ID, SECRET_ACCESS_KEY, AWS_REGION } = process.env;
 
@@ -17,20 +20,14 @@ if (!ACCESS_KEY_ID || !SECRET_ACCESS_KEY || !AWS_REGION) {
     throw new Error("Missing AWS Credentials in .env file");
 }
 
-// const sqsClient = new SQSClient({
-//     region: AWS_REGION,
-//     credentials: {
-//         accessKeyId: ACCESS_KEY_ID,
-//         secretAccessKey: SECRET_ACCESS_KEY
-//     }
-// });
-
 const s3Client = new S3Client({ 
     region : AWS_REGION , 
     credentials : {
         accessKeyId : ACCESS_KEY_ID , 
         secretAccessKey : SECRET_ACCESS_KEY
-    }
+    },
+    requestChecksumCalculation: "WHEN_REQUIRED", 
+    responseChecksumValidation: "WHEN_REQUIRED"
 });
 
 
@@ -40,7 +37,7 @@ app.post('/upload' , async (req , res) => {
     try{
 
         //we take the filename and content type from the user
-        const {fileName , ContentType} = req.body; 
+        const {fileName , contentType} = req.body; 
 
 
         if (!fileName) {
@@ -54,7 +51,7 @@ app.post('/upload' , async (req , res) => {
         const input : PutObjectCommandInput = {
         Bucket : process.env.BUCKET , 
         Key : key,
-        ContentType : ContentType
+        ContentType : contentType
     };
 
     const response = new PutObjectCommand(input)
