@@ -1,18 +1,18 @@
-# Step 1: Use Node.js as the base
-FROM node:22-slim
+# Use Alpine-based Node image (smaller, more reliable mirrors)
+FROM node:22-alpine
 
-# Step 2: Install FFmpeg (this is why we use a container!)
-RUN apt-get update && apt-get install -y ffmpeg
+# Install FFmpeg
+RUN apk add --no-cache ffmpeg
 
-# Step 3: Set up the working directory
+# Set up the working directory
 WORKDIR /app
 
-# Step 4: Copy package files and install dependencies
+# Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm install --production
 
-# Step 5: Copy your compiled TS code (from the /dist folder)
+# Copy the compiled code
 COPY dist/ ./dist/
 
-# Step 6: The "Magic Line" - This runs automatically on boot
-CMD ["node", "dist/worker.js"]
+# Run the worker
+CMD ["node", "dist/handler/worker.js"]

@@ -14,7 +14,7 @@ export const handler = async (event: any) => {
 
         const input: RunTaskCommandInput = {
             cluster: process.env.CLUSTER,
-            taskDefinition: "zylar-transcoder",
+            taskDefinition: "latest-task-definition",
             launchType: "FARGATE",
             networkConfiguration: {
                 awsvpcConfiguration: {
