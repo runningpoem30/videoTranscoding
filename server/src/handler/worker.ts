@@ -23,7 +23,9 @@ async function downloadFromS3(bucket : string , key : string , destination : str
 
 
 async function transcodingRawS3Video(inputPath : string , outputDir : string){
-   const ffmpeg = spawn('ffmpeg', [
+
+  return new Promise((resolve , reject) => {
+       const ffmpeg = spawn('ffmpeg', [
     '-i', inputPath,
 
     '-filter_complex',
@@ -49,6 +51,11 @@ async function transcodingRawS3Video(inputPath : string , outputDir : string){
       '-hls_segment_filename', `${outputDir}/v%v/segment_%03d.ts`,
       `${outputDir}/v%v/index.m3u8`,
   ]);
+    ffmpeg.on('close'  , (code) => {
+      if(code === 0 ) resolve(null);
+      else reject(`ffmpeg failed withc code${code}`)
+    })
+  })
 }
 
 
@@ -75,3 +82,36 @@ async function uploadFolderToS3(localDirPath: string, s3Bucket: string, s3Prefix
         }
     }
 }
+
+
+async function run() {
+    const BUCKET = process.env.S3_BUCKET!;
+    const KEY = process.env.S3_KEY!;
+    const DEST_BUCKET = process.env.DEST_BUCKET!; 
+    
+    const inputPath = '/tmp/input_video.mp4';
+    const outputDir = '/tmp/output';
+
+    try {
+        
+        console.log("Stage 1: Downloading...");
+        await downloadFromS3(BUCKET, KEY, inputPath);
+
+   
+        console.log("Stage 2: Transcoding...");
+        await transcodingRawS3Video(inputPath, outputDir);
+
+       
+        console.log("Stage 3: Uploading to new bucket...");
+        
+        const folderName = path.parse(KEY).name; 
+        await uploadFolderToS3(outputDir, DEST_BUCKET, `processed/${folderName}`);
+
+        console.log("SUCCESS: Video is now live!");
+    } catch (err) {
+        console.error("FAILED:", err);
+        process.exit(1); 
+    }
+}
+
+run();
