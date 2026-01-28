@@ -27,10 +27,11 @@ export const handler = async (event : any) => {
                 overrides: {
                     containerOverrides: [
                         {
-                            name: "video-processor",
+                            name: "zylar-transcoder",
                             environment: [
                                 { name: "S3_BUCKET", value: bucket },
                                 { name: "S3_KEY", value: key },
+                                { name: 'DEST_BUCKET', value: 'zylar-processed-videos' }
                             ],
                         },
                     ],
