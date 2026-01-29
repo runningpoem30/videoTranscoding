@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import LandingPage from './components/LandingPage';
 import TranscodingVideo from './components/TranscodingVideo';
 import Login from './components/Login';
@@ -14,6 +15,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/transcode" element={<TranscodingVideo />} />
       </Routes>
+      <Analytics />
     </Router>
   );
 }
