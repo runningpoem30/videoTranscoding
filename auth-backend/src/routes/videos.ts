@@ -90,4 +90,23 @@ router.delete('/:id', authenticate, async (req: any, res) => {
   }
 });
 
+// GET /usage - Check storage limit
+router.get('/usage', authenticate, async (req: any, res) => {
+  try {
+    const videos = await prisma.video.findMany({
+      where: { userId: req.userId }
+    });
+
+    const totalUsed = videos.reduce((acc, video) => acc + (video.originalFileSize || 0), 0);
+    
+    res.json({
+      used: totalUsed,
+      limit: 500 * 1024 * 1024 // 500MB
+    });
+  } catch (error) {
+    console.error('Usage check error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
