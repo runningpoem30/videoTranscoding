@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import videojs from 'video.js';
 import 'video.js/dist/video-js.css';
 
@@ -38,8 +38,9 @@ export default function VideoPlayer({ options, onReady }: VideoPlayerProps) {
 
                 // Initialize the source selector plugin
                 try {
-                    if (typeof player.httpSourceSelector === 'function') {
-                        player.httpSourceSelector();
+                    const p = player as any;
+                    if (typeof p.httpSourceSelector === 'function') {
+                        p.httpSourceSelector();
                     }
                 } catch (e) {
                     console.warn('Plugin init failed, falling back to manual detection');
@@ -50,7 +51,8 @@ export default function VideoPlayer({ options, onReady }: VideoPlayerProps) {
 
             // Handle quality levels manually and log them
             player.on('loadedmetadata', () => {
-                const qualityLevels = player.qualityLevels();
+                const p = player as any;
+                const qualityLevels = p.qualityLevels();
                 console.log('Detected Quality Levels:', qualityLevels.length);
 
                 // Log individual levels for debugging
