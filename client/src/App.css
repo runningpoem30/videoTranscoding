@@ -11,7 +11,9 @@
   --text-secondary: #94a3b8;
   --border-color: rgba(255, 255, 255, 0.1);
   --sidebar-width: 280px;
+  --sidebar-collapsed-width: 70px;
 }
+
 
 body {
   margin: 0;
@@ -1021,8 +1023,28 @@ body {
   left: 0;
   top: 0;
   height: 100vh;
-  transition: transform 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
 }
+
+.sidebar-fixed.collapsed {
+  width: var(--sidebar-collapsed-width);
+}
+
+.main-with-sidebar.collapsed {
+  margin-left: var(--sidebar-collapsed-width);
+}
+
+.collapsed .hide-on-collapse {
+  display: none !important;
+}
+
+.collapsed .center-on-collapse {
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
 
 @media (max-width: 768px) {
   .main-with-sidebar {
