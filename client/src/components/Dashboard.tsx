@@ -70,25 +70,40 @@ export default function Dashboard() {
     }]
   } : null;
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100vw', background: '#fff', color: '#000', fontFamily: "'Inter', sans-serif" }}>
+    <div className={isSidebarOpen ? 'sidebar-open' : ''} style={{ display: 'flex', minHeight: '100vh', width: '100%', background: '#fff', color: '#000', fontFamily: "'Inter', sans-serif" }}>
+      {/* MOBILE TOGGLE */}
+      <button 
+        className="mobile-nav-toggle"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        {isSidebarOpen ? '✕' : '☰'}
+      </button>
+
       {/* SIDEBAR */}
-      <aside style={{ width: '280px', borderRight: '1px solid #e0e0e0', display: 'flex', flexDirection: 'column', height: '100vh', position: 'fixed', left: 0, top: 0, background: '#fff', zIndex: 100 }}>
+      <aside className="sidebar-fixed" style={{ borderRight: '1px solid #e0e0e0', display: 'flex', flexDirection: 'column', background: '#fff', zIndex: 100 }}>
         <div style={{ padding: '1rem', borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div 
-            onClick={() => navigate('/transcode')}
+            onClick={() => { navigate('/transcode'); setIsSidebarOpen(false); }}
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
           >
             <span style={{ fontSize: '1.2rem', color: '#4f46e5' }}>▶</span>
             <span style={{ fontWeight: 800, fontSize: '1rem' }}>Zylar</span>
           </div>
-          <span style={{ color: '#000', cursor: 'pointer', fontWeight: 300, fontSize: '1rem' }}>«</span>
+          <span 
+            onClick={() => setIsSidebarOpen(false)}
+            style={{ color: '#000', cursor: 'pointer', fontWeight: 300, fontSize: '1rem' }}
+          >
+            «
+          </span>
         </div>
 
         <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 1rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
             <h3 style={{ fontSize: '0.9rem', fontWeight: 800, margin: 0 }}>Projects</h3>
-            <button onClick={() => navigate('/transcode')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>+</button>
+            <button onClick={() => { navigate('/transcode'); setIsSidebarOpen(false); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>+</button>
           </div>
           
           {loading ? (
@@ -107,7 +122,7 @@ export default function Dashboard() {
                     cursor: 'pointer', 
                     background: '#fff' 
                   }}
-                  onClick={() => setSelectedVideo(video)}
+                  onClick={() => { setSelectedVideo(video); setIsSidebarOpen(false); }}
                 >
                   <div style={{ fontWeight: 800, fontSize: '0.85rem', marginBottom: '0.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {video.originalFileName}
@@ -132,7 +147,7 @@ export default function Dashboard() {
       </aside>
 
       {/* MAIN CONTENT */}
-      <main style={{ flex: 1, marginLeft: '280px', display: 'flex', flexDirection: 'column', background: '#fafafa', minHeight: '100vh', padding: '2rem' }}>
+      <main className="main-with-sidebar" style={{ flex: 1, display: 'flex', flexDirection: 'column', background: '#fafafa', minHeight: '100vh', padding: '2rem' }}>
         {selectedVideo ? (
           <div style={{ maxWidth: '900px', width: '100%', margin: '0 auto' }}>
             <div style={{ marginBottom: '2rem' }}>

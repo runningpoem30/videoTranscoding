@@ -127,19 +127,34 @@ export default function TranscodingVideo() {
     }
   };
 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', width: '100vw', background: '#fff', color: '#000', fontFamily: "'Inter', sans-serif" }}>
+    <div className={isSidebarOpen ? 'sidebar-open' : ''} style={{ display: 'flex', minHeight: '100vh', width: '100%', background: '#fff', color: '#000', fontFamily: "'Inter', sans-serif" }}>
+      {/* MOBILE TOGGLE */}
+      <button 
+        className="mobile-nav-toggle"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        {isSidebarOpen ? '✕' : '☰'}
+      </button>
+
       {/* SIDEBAR */}
-      <aside style={{ width: '280px', borderRight: '1px solid #e0e0e0', display: 'flex', flexDirection: 'column', height: '100vh', position: 'fixed', left: 0, top: 0, background: '#fff' }}>
+      <aside className="sidebar-fixed" style={{ borderRight: '1px solid #e0e0e0', display: 'flex', flexDirection: 'column', background: '#fff' }}>
         <div style={{ padding: '1rem', borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <div 
-            onClick={() => navigate('/transcode')}
+            onClick={() => { navigate('/transcode'); setIsSidebarOpen(false); }}
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
           >
             <span style={{ fontSize: '1.2rem', color: '#4f46e5' }}>▶</span>
             <span style={{ fontWeight: 800, fontSize: '1rem' }}>Zylar</span>
           </div>
-          <span style={{ color: '#000', cursor: 'pointer', fontWeight: 300, fontSize: '1rem' }}>«</span>
+          <span 
+            onClick={() => setIsSidebarOpen(false)}
+            style={{ color: '#000', cursor: 'pointer', fontWeight: 300, fontSize: '1rem' }}
+          >
+            «
+          </span>
         </div>
 
         <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 1rem' }}>
@@ -155,7 +170,7 @@ export default function TranscodingVideo() {
                 <div 
                   key={video.id} 
                   style={{ padding: '1rem', border: '1px solid #e0e0e0', borderRadius: '8px', cursor: 'pointer', background: '#fff' }}
-                  onClick={() => navigate('/dashboard')}
+                  onClick={() => { navigate('/dashboard'); setIsSidebarOpen(false); }}
                 >
                   <div style={{ fontWeight: 800, fontSize: '0.85rem', marginBottom: '0.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {video.originalFileName}
@@ -185,7 +200,8 @@ export default function TranscodingVideo() {
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <main style={{ flex: 1, marginLeft: '280px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#fff', padding: '2rem' }}>
+      <main className="main-with-sidebar" style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#fff', padding: '2rem' }}>
+
         <div style={{ textAlign: 'center', maxWidth: '600px', width: '100%' }}>
           <h1 style={{ fontSize: '2.5rem', fontWeight: 800, marginBottom: '1rem', color: '#000', letterSpacing: '-0.02em' }}>
             What do you want to transcode?
