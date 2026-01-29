@@ -30,7 +30,7 @@ export const handler = async (event: any) => {
                         environment: [
                             { name: "S3_BUCKET", value: bucket },
                             { name: "S3_KEY", value: key },
-                            { name: 'DEST_BUCKET', value: 'zylar-processed-videos' }
+                            { name: 'DEST_BUCKET', value: 'zylar.space.destbucket' }
                         ],
                     },
                 ],
