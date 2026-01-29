@@ -12,6 +12,7 @@ const PORT = process.env.PORT || 3001;
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:3000',
+  'https://zylar.site',
   'https://zylar.space',
   process.env.FRONTEND_URL
 ].filter(Boolean) as string[];
@@ -23,6 +24,7 @@ app.use(cors({
     
     const isAllowed = allowedOrigins.includes(origin) || 
                      origin.endsWith('.vercel.app') || 
+                     origin.includes('zylar.site') ||
                      origin.includes('zylar.space');
 
     if (isAllowed) {
