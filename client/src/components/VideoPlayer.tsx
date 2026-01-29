@@ -11,10 +11,9 @@ interface VideoPlayerProps {
     onReady?: (player: any) => void;
 }
 
-export const VideoPlayer: React.FC<VideoPlayerProps> = (props) => {
+export default function VideoPlayer({ options, onReady }: VideoPlayerProps) {
     const videoRef = useRef<HTMLDivElement>(null);
     const playerRef = useRef<any>(null);
-    const { options, onReady } = props;
 
     useEffect(() => {
         // Make sure Video.js player is only initialized once
@@ -94,4 +93,4 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = (props) => {
     );
 }
 
-export default VideoPlayer;
+
