@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@300;400;600;700&display=swap');
 
 :root {
   --bg-color: #0c0c0e;
@@ -289,12 +289,13 @@ body {
 }
 
 .login-btn {
-  padding: 0.6rem 1.75rem;
+  padding: 0.75rem 2.25rem;
   background: #1a1a1a;
   border: none;
-  border-radius: 8px;
+  border-radius: 0;
   color: #ffffff;
-  font-size: 0.95rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.05rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -469,33 +470,40 @@ body {
 
 .features-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 3.5rem;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
 }
 
 .feature-item {
-  position: relative;
+  border: 1px solid #d0d0d0;
+  padding: 2.5rem 2rem;
+  background: #ffffff;
+  transition: border-color 0.2s ease;
 }
 
-.feature-number {
-  font-size: 3rem;
-  font-weight: 900;
-  color: #f0f0f0;
-  margin-bottom: 1rem;
-  line-height: 1;
+.feature-item:hover {
+  border-color: #1a1a1a;
 }
 
 .feature-item h3 {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem;
   color: #1a1a1a;
+  letter-spacing: -0.01em;
 }
 
 .feature-item p {
-  font-size: 1.05rem;
-  line-height: 1.7;
+  font-size: 0.95rem;
+  line-height: 1.6;
   color: #6b6b6b;
+}
+
+@media (max-width: 1024px) {
+  .features-list {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
 }
 
 .landing-footer {
@@ -797,10 +805,11 @@ body {
   background: transparent;
   border: 1px solid #d0d0d0;
   color: #1a1a1a;
-  padding: 0.6rem 1.2rem;
-  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }

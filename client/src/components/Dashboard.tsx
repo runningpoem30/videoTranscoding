@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import VideoPlayer from './VideoPlayer';
-import '../App.css';
 
 interface Video {
   id: string;
@@ -15,6 +14,7 @@ export default function Dashboard() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [user, setUser] = useState<{ email: string } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,6 +22,11 @@ export default function Dashboard() {
     if (!token) {
       navigate('/login');
       return;
+    }
+
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      setUser(JSON.parse(userData));
     }
 
     fetchVideos();
@@ -32,14 +37,12 @@ export default function Dashboard() {
       const token = localStorage.getItem('token');
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
       const response = await fetch(`${backendUrl}/api/videos`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+        headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
       if (response.ok) {
-        setVideos(data.videos);
-        if (data.videos.length > 0 && !selectedVideo) {
+        setVideos(data.videos || []);
+        if (data.videos?.length > 0 && !selectedVideo) {
           setSelectedVideo(data.videos[0]);
         }
       }
@@ -68,93 +71,109 @@ export default function Dashboard() {
   } : null;
 
   return (
-    <div className="dashboard-container">
-      <header className="landing-header">
-        <div className="logo" onClick={() => navigate('/')} style={{cursor: 'pointer'}}>
-          <span className="logo-icon">▶</span> Zylar
-        </div>
-        <div className="header-actions">
-          <button className="secondary-cta" onClick={() => navigate('/transcode')}>New Transcode</button>
-          <button className="login-btn" onClick={handleLogout}>Logout</button>
-        </div>
-      </header>
-
-      <main className="dashboard-main">
-        <div className="dashboard-grid">
-          <div className="videos-sidebar">
-            <h2 className="section-title">My Videos</h2>
-            {loading ? (
-              <p>Loading videos...</p>
-            ) : videos.length === 0 ? (
-              <div className="empty-state">
-                <p>No videos transcoded yet.</p>
-                <button className="primary-cta" onClick={() => navigate('/transcode')}>Start Transcoding</button>
-              </div>
-            ) : (
-              <div className="video-list">
-                {videos.map(video => (
-                  <div 
-                    key={video.id} 
-                    className={`video-item ${selectedVideo?.id === video.id ? 'active' : ''}`}
-                    onClick={() => setSelectedVideo(video)}
-                  >
-                    <div className="video-item-info">
-                      <span className="video-name">{video.originalFileName}</span>
-                      <span className="video-date">
-                        {new Date(video.createdAt).toLocaleDateString()}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+    <div style={{ display: 'flex', minHeight: '100vh', width: '100vw', background: '#fff', color: '#000', fontFamily: "'Inter', sans-serif" }}>
+      {/* SIDEBAR */}
+      <aside style={{ width: '280px', borderRight: '1px solid #e0e0e0', display: 'flex', flexDirection: 'column', height: '100vh', position: 'fixed', left: 0, top: 0, background: '#fff', zIndex: 100 }}>
+        <div style={{ padding: '1rem', borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div 
+            onClick={() => navigate('/transcode')}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}
+          >
+            <span style={{ fontSize: '1.2rem', color: '#4f46e5' }}>▶</span>
+            <span style={{ fontWeight: 800, fontSize: '1rem' }}>Zylar</span>
           </div>
+          <span style={{ color: '#000', cursor: 'pointer', fontWeight: 300, fontSize: '1rem' }}>«</span>
+        </div>
 
-          <div className="video-preview-section">
-            {selectedVideo ? (
-              <div className="preview-container">
-                <div className="player-wrapper shadow-glow" style={{borderRadius: '4px', overflow: 'hidden', background: '#000'}}>
-                  <VideoPlayer key={selectedVideo.id} options={videoJsOptions} />
-                </div>
-                <div className="video-details-card">
-                  <h3>Stream Details</h3>
-                  <div className="detail-row">
-                    <span className="detail-label">Filename</span>
-                    <span className="detail-value">{selectedVideo.originalFileName}</span>
+        <div style={{ flex: 1, overflowY: 'auto', padding: '1.5rem 1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+            <h3 style={{ fontSize: '0.9rem', fontWeight: 800, margin: 0 }}>Projects</h3>
+            <button onClick={() => navigate('/transcode')} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>+</button>
+          </div>
+          
+          {loading ? (
+            <div style={{ color: '#999', fontSize: '0.8rem' }}>Loading videos...</div>
+          ) : videos.length === 0 ? (
+            <div style={{ color: '#999', fontSize: '0.8rem' }}>No projects yet.</div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {videos.map(video => (
+                <div 
+                  key={video.id} 
+                  style={{ 
+                    padding: '1rem', 
+                    border: selectedVideo?.id === video.id ? '2px solid #000' : '1px solid #e0e0e0', 
+                    borderRadius: '8px', 
+                    cursor: 'pointer', 
+                    background: '#fff' 
+                  }}
+                  onClick={() => setSelectedVideo(video)}
+                >
+                  <div style={{ fontWeight: 800, fontSize: '0.85rem', marginBottom: '0.25rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {video.originalFileName}
                   </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Status</span>
-                    <span className="detail-value status-badge">{selectedVideo.status}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">HLS Master Playlist</span>
-                    <div className="url-copy-box">
-                      <input readOnly value={selectedVideo.cloudfrontUrl} className="url-mini-input" />
-                      <button 
-                        className="copy-btn"
-                        onClick={() => {
-                          navigator.clipboard.writeText(selectedVideo.cloudfrontUrl);
-                          alert('URL copied to clipboard!');
-                        }}
-                      >
-                        Copy
-                      </button>
-                    </div>
+                  <div style={{ fontSize: '0.7rem', color: '#999' }}>
+                    {new Date(video.createdAt).toLocaleDateString()}
                   </div>
                 </div>
-              </div>
-            ) : (
-              <div className="no-selection shadow-glow">
-                <p>Select a video from the list to preview</p>
-              </div>
-            )}
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div style={{ padding: '1rem', borderTop: '1px solid #e0e0e0' }}>
+          <div style={{ fontSize: '0.75rem', fontWeight: 800, marginBottom: '1rem', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: '#000' }}>
+            {user?.email || 'user@example.com'}
+          </div>
+          <div style={{ display: 'flex' }}>
+            <button onClick={handleLogout} style={{ flex: 1, padding: '0.6rem', background: '#fff', border: '1px solid #e0e0e0', fontSize: '0.75rem', fontWeight: 800, cursor: 'pointer' }}>Sign out</button>
           </div>
         </div>
+      </aside>
+
+      {/* MAIN CONTENT */}
+      <main style={{ flex: 1, marginLeft: '280px', display: 'flex', flexDirection: 'column', background: '#fafafa', minHeight: '100vh', padding: '2rem' }}>
+        {selectedVideo ? (
+          <div style={{ maxWidth: '900px', width: '100%', margin: '0 auto' }}>
+            <div style={{ marginBottom: '2rem' }}>
+              <h1 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '0.5rem' }}>{selectedVideo.originalFileName}</h1>
+              <p style={{ color: '#666', fontSize: '0.9rem' }}>Created on {new Date(selectedVideo.createdAt).toLocaleDateString()}</p>
+            </div>
+
+            <div style={{ background: '#000', borderRadius: '4px', overflow: 'hidden', marginBottom: '2rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+              <VideoPlayer key={selectedVideo.id} options={videoJsOptions} />
+            </div>
+
+            <div style={{ background: '#fff', padding: '2rem', border: '1px solid #e0e0e0' }}>
+              <h3 style={{ fontSize: '0.75rem', fontWeight: 800, color: '#999', textTransform: 'uppercase', marginBottom: '1rem', letterSpacing: '0.05em' }}>Adaptive Stream URL</h3>
+              <div style={{ display: 'flex', border: '1px solid #e0e0e0', padding: '0.25rem', background: '#f9f9f9', marginBottom: '1.5rem' }}>
+                <input readOnly value={selectedVideo.cloudfrontUrl} style={{ flex: 1, border: 'none', background: 'none', padding: '0.75rem', fontFamily: 'monospace', fontSize: '0.85rem' }} />
+                <button 
+                  onClick={() => { navigator.clipboard.writeText(selectedVideo.cloudfrontUrl); alert('Copied!'); }}
+                  style={{ background: '#000', color: '#fff', border: 'none', padding: '0 1.5rem', fontWeight: 800, cursor: 'pointer' }}
+                >
+                  Copy
+                </button>
+              </div>
+              
+              <div style={{ display: 'flex', gap: '2rem' }}>
+                <div>
+                  <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#999', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Status</h4>
+                  <span style={{ padding: '0.25rem 0.75rem', background: '#e1f5fe', color: '#01579b', fontSize: '0.8rem', fontWeight: 700, borderRadius: '4px' }}>{selectedVideo.status}</span>
+                </div>
+                <div>
+                  <h4 style={{ fontSize: '0.7rem', fontWeight: 800, color: '#999', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Provider</h4>
+                  <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>AWS CloudFront</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', color: '#999' }}>
+            {loading ? "Loading your videos..." : "Select a project from the sidebar to view"}
+          </div>
+        )}
       </main>
-
-      <footer className="landing-footer">
-        <p>© 2026 Zylar. All rights reserved.</p>
-      </footer>
     </div>
   );
 }

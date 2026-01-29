@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { GoogleLogin } from '@react-oauth/google';
 import '../App.css';
 
 export default function Login() {
@@ -10,6 +11,30 @@ export default function Login() {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    setError('');
+    setLoading(true);
+    try {
+      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+      const response = await fetch(`${backendUrl}/api/auth/google`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ credential: credentialResponse.credential }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Google login failed');
+
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      navigate('/transcode');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,8 +71,8 @@ export default function Login() {
   return (
     <div className="auth-container">
       <div className="auth-box">
-        <div className="auth-logo">
-          <span className="logo-icon">▶</span>
+        <div className="auth-logo" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
+          <span className="logo-icon" style={{ color: '#4f46e5' }}>▶</span>
         </div>
 
         <h1 className="auth-title">
@@ -56,6 +81,17 @@ export default function Login() {
         <p className="auth-subtitle">
           {isSignUp ? 'Sign up to start transcoding' : 'Sign in to continue to Zylar'}
         </p>
+
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+          <GoogleLogin 
+            onSuccess={handleGoogleSuccess}
+            onError={() => setError('Google Login Failed')}
+            useOneTap
+            width="100%"
+          />
+        </div>
+
+        <div className="divider-text">OR</div>
 
         {error && <div className="error-message">{error}</div>}
 
